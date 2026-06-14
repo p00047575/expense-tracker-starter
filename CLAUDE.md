@@ -22,10 +22,10 @@ There is no test runner configured.
 
 A single-page React 19 app bootstrapped by Vite. `src/main.jsx` is the entry point and mounts `<App />` in `<StrictMode>`. The UI is split into `App` plus three child components, each in its own file under `src/`:
 
-- `src/App.jsx` — owns the shared `transactions` data and the `categories` list in local `useState` (no backend, no persistence, no router, no state library). The seed `transactions` array is the source of truth; `addTransaction` appends to it. `App` composes the children and passes data/callbacks down. Reloading the page resets everything to the seed data.
+- `src/App.jsx` — owns the shared `transactions` data and the `categories` list in local `useState` (no backend, no persistence, no router, no state library). The seed `transactions` array is the source of truth; `addTransaction` appends to it and `deleteTransaction` removes one by `id` (filtering it out of state). `App` composes the children and passes data/callbacks (`onAdd`, `onDelete`) down. Reloading the page resets everything to the seed data.
 - `src/Summary.jsx` — receives `transactions` and derives `totalIncome`/`totalExpenses`/`balance` on each render.
 - `src/TransactionForm.jsx` — owns its own form-field state (`description`, `amount`, `type`, `category`); on submit it builds a transaction (coercing `amount` to a number) and calls the `onAdd` callback, then resets its fields.
-- `src/TransactionList.jsx` — owns its own `filterType`/`filterCategory` state and renders the filtered table from the `transactions` prop.
+- `src/TransactionList.jsx` — owns its own `filterType`/`filterCategory` state and renders the filtered table from the `transactions` prop. Each row has a Delete button that prompts via `window.confirm` and, on confirm, calls the `onDelete` callback with the transaction's `id`.
 
 Each child manages its own local UI state, so `App` is just data + composition. Lifted/shared state lives in `App`; transient form and filter state stays local to the component that uses it.
 
