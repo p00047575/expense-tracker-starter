@@ -20,16 +20,18 @@ There is no test runner configured.
 
 ## Architecture
 
-A single-page React 19 app bootstrapped by Vite. The entire application is one component:
+A single-page React 19 app bootstrapped by Vite. `src/main.jsx` is the entry point and mounts `<App />` in `<StrictMode>`. The UI is split into `App` plus three child components, each in its own file under `src/`:
 
-- `src/main.jsx` — entry point, mounts `<App />` in `<StrictMode>`.
-- `src/App.jsx` — the whole app. All state, business logic, and markup live here.
+- `src/App.jsx` — owns the shared `transactions` data and the `categories` list in local `useState` (no backend, no persistence, no router, no state library). The seed `transactions` array is the source of truth; `addTransaction` appends to it. `App` composes the children and passes data/callbacks down. Reloading the page resets everything to the seed data.
+- `src/Summary.jsx` — receives `transactions` and derives `totalIncome`/`totalExpenses`/`balance` on each render.
+- `src/TransactionForm.jsx` — owns its own form-field state (`description`, `amount`, `type`, `category`); on submit it builds a transaction (coercing `amount` to a number) and calls the `onAdd` callback, then resets its fields.
+- `src/TransactionList.jsx` — owns its own `filterType`/`filterCategory` state and renders the filtered table from the `transactions` prop.
 
-`App.jsx` holds all data in local `useState` (no backend, no persistence, no router, no state library). The seed `transactions` array is the source of truth; adding a transaction appends to it. Income/expense totals and the balance are derived inline on each render, and filtered views are computed from `filterType`/`filterCategory`. Reloading the page resets everything to the seed data.
+Each child manages its own local UI state, so `App` is just data + composition. Lifted/shared state lives in `App`; transient form and filter state stays local to the component that uses it.
 
-### Known intentional bug
+### `amount` is numeric
 
-In `App.jsx`, transaction `amount` is stored as a **string** (both seed data and the add-transaction form). The `totalIncome`/`totalExpenses` reducers do `sum + t.amount`, which concatenates strings instead of adding numbers. Any fix to the totals must also account for the string-typed `amount` field flowing in from the form.
+Transaction `amount` is a **number** everywhere: numeric literals in the seed data, and `Number(amount)` coercion in `TransactionForm` before a new transaction is added. `Summary`'s reducers also wrap with `Number()` defensively. (This fixes the original course bug where `amount` was a string and the totals concatenated instead of summing — keep amounts numeric when adding new data or fields.)
 
 ## Conventions
 
