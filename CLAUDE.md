@@ -26,6 +26,7 @@ A single-page React 19 app bootstrapped by Vite. `src/main.jsx` is the entry poi
 - `src/Summary.jsx` — receives `transactions` and derives `totalIncome`/`totalExpenses`/`balance` on each render.
 - `src/TransactionForm.jsx` — owns its own form-field state (`description`, `amount`, `type`, `category`); on submit it builds a transaction (coercing `amount` to a number) and calls the `onAdd` callback, then resets its fields.
 - `src/TransactionList.jsx` — owns its own `filterType`/`filterCategory` state and renders the filtered table from the `transactions` prop. Each row has a Delete button that prompts via `window.confirm` and, on confirm, calls the `onDelete` callback with the transaction's `id`.
+- `src/SpendingChart.jsx` — receives `transactions`, filters to expenses, groups amounts by category, and renders a Recharts `BarChart` (X: category, Y: dollar amount). Returns `null` when there are no expenses. No local state.
 
 Each child manages its own local UI state, so `App` is just data + composition. Lifted/shared state lives in `App`; transient form and filter state stays local to the component that uses it.
 
@@ -38,3 +39,4 @@ Transaction `amount` is a **number** everywhere: numeric literals in the seed da
 - ESLint flat config (`eslint.config.js`); `dist` is ignored. The `no-unused-vars` rule ignores identifiers matching `^[A-Z_]` (constants/components).
 - Plain JavaScript + JSX (`.jsx`), ES modules, no TypeScript despite `@types/react` being present.
 - Styling is plain CSS: `src/App.css` (component) and `src/index.css` (global).
+- Recharts is installed for the spending bar chart (`recharts` package).
